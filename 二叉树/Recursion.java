@@ -74,13 +74,54 @@ class Recursion {
         if (head == null) {
             return;
         }
-        inOrder(head.left);
-        inOrder(head.right);
+        postOrder(head.left);
+        postOrder(head.right);
         System.out.print(head.val + " ");
     }
     // 后序 - 非递归实现 - 两个栈实现
-    public static void postOrder2(TreeNode<Integer> head) {
+    public static void postOrderTwoStacks(TreeNode<Integer> head) {
+        Stack<TreeNode<Integer>> stack = new Stack<>();
+        Stack<TreeNode<Integer>> collect = new Stack<>();
+        stack.push(head);
 
+        // 按, 中 -> 右 -> 左 顺序入collect栈
+        while (!stack.isEmpty()) {
+            TreeNode<Integer> top = stack.pop();
+            collect.push(top);
+            // 先压左, 再压右
+            if (top.left != null) {
+                stack.push(top.left);
+            }
+            if (top.right != null) {
+                stack.push(top.right);
+            }
+        }
+        // 出栈就是: 左 -> 右 -> 中
+        while (!collect.isEmpty()) {
+            System.out.print(collect.pop().val + " ");
+        }
+    }
+    // 后序 - 非递归实现 - 一个个栈实现
+    public static void postOrderOneStacks(TreeNode<Integer> head) {
+        Stack<TreeNode<Integer>> stack = new Stack<>();
+        stack.push(head);
+        while (!stack.isEmpty()) {
+            TreeNode<Integer> cur = stack.peek();
+            if (cur.left != null && cur.left != head && cur.right != head) {
+                // 左树不为空 && 左树没处理过进来
+                // cur.right != head 这个条件是必要的, 如果head == cur.right
+                // 说明右树已经处理过了, 如果右树处理了, 左树一定也已经处理过了
+                stack.push(cur.left);
+            }else if (cur.right != null && cur.right != head) {
+                stack.push(cur.right);
+            }else {
+                // 左右为空, 或者, 左右都处理过了
+                // 就可以打印这个节点了
+                head = stack.pop();
+                System.out.print(head.val + " ");
+
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -100,12 +141,16 @@ class Recursion {
         Recursion.preOrder2(head);*/
 
         // 测试 - 中序遍历
-        Recursion.inOrder(head);
+        /*Recursion.inOrder(head);
         System.out.println();
-        Recursion.inOrder2(head);
+        Recursion.inOrder2(head);*/
 
         // 测试 - 后序遍历
-        //Recursion.postOrder(head);
+        postOrder(head);
+        System.out.println();
+        postOrderTwoStacks(head);
+        System.out.println();
+        postOrderOneStacks(head);
     }
 
 
